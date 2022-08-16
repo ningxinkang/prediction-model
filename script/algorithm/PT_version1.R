@@ -1,6 +1,6 @@
 ##__________________________________________________________________
 ## Author: Ningxin Kang (nik010@ucsd.edu)       
-## Last update: 2022-08-13    
+## Last update: 2022-08-15    
 ## File: PT_version1.R          
 ## Functions: 
 ##  PT_checker(PT_angle, PT_span, PT_span_max, t, PHGDH, donor_id, REGTRYID)
@@ -58,28 +58,16 @@ library(tidyr)
 #' @examples
 #' PT_checker(1.5, 0.4, c(-12.0, -11.0, -10.0, -9.0, -8.0, -6.5, -5.5, -4.0, -3.0, -1.5, 0.0), c(10.17161, 5.47887, 8.37505, 3.071834, 42.142075, 68.835006), "C_1_F", "14058")
 
-PT_checker <- 
+input_checker <- 
   function(PT_angle, PT_span, PT_span_max, t, PHGDH, donor_id, REGTRYID){
-    ## Return variables record the number of test conducted and the time span of 
-    ## the increasing period. 
+    ## Return the time span of the increasing period. 
     period = list()
-    test = 0
-    
-    ## A boolean worked as a stop sign. When a increasing period is identified, 
-    ## the stop sign will become TRUE, ending the testing loop.
-    stop = FALSE
     
     ## Start looping through the blood test result
     ## Determine the end of comparing time span
     for (i in 2:length(PHGDH)){
       t_earliest = t[i] - PT_span_max
       t_latest = t[i] - PT_span
-      
-      ## Number of PT increment when there is another blood draw conducted
-      ## within the time span
-      if (sum(t >= t_earliest & t <= t_latest)>0){
-        test = test + 1
-      }
       
       ## Start comparing
       for (j in 1:(i-1)){
@@ -89,6 +77,11 @@ PT_checker <-
           
           ## Evaluate if the increasing slope reach the threshold
           if ((PHGDH[[i]]-PHGDH[[j]])/(t[[i]]-t[[j]]) >= tanpi(PT_angle)){
+            ## A boolean worked as a sign for positive PT period.
+            ## When a increasing period is identified, 
+            ## the 'mark' will become TRUE, ending the testing loop.
+            mark = FALSE
+            
             for (k in t_i_start:t_i_end){
               ## If the exRNA PHGDH level decrease during the time span, 
               ## PT is considered negative
@@ -98,9 +91,8 @@ PT_checker <-
                 ## Check fluctuation until reach the last blood draw
                 if (k == i){
                   ## Record the increasing positive PT period
-                  stop = TRUE
-                  period <- period %>% 
-                    append(list(list(t[[j]],t[[i]])))
+                  mark = TRUE
+                  period <- period %>% append(list(list(t[[j]],t[[i]])))
                   test_record <<-test_record %>% 
                     rbind(data.frame(REGTRYID = REGTRYID, 
                                      donor_id_alias = donor_id, 
@@ -114,31 +106,48 @@ PT_checker <-
                 }
               }
             }
-            if (stop) {break}
-            ## Record the negative PT period that fail to pass 
-            ## fluctuation restriction
-            test_record <<-test_record %>% 
-              rbind(data.frame(REGTRYID = REGTRYID, donor_id_alias = donor_id, 
-                               x1 = t[j], x2 = t[i], 
-                               y1 = PHGDH[j], y2 = PHGDH[i], type = "negative"))
-            PT_end <<- PT_end %>% 
-              rbind(data.frame(REGTRYID = REGTRYID, donor_id_alias = donor_id, 
-                               mark = t[i]))
+            if (mark == FALSE) {
+              ## Record the negative PT period that fail to pass 
+              ## fluctuation restriction
+              test_record <<-test_record %>% 
+                rbind(data.frame(REGTRYID = REGTRYID, 
+                                 donor_id_alias = donor_id, 
+                                 x1 = t[j], x2 = t[i], y1 = PHGDH[j], 
+                                 y2 = PHGDH[i], type = "negative"))
+              PT_end <<- PT_end %>% 
+                rbind(data.frame(REGTRYID = REGTRYID, 
+                                 donor_id_alias = donor_id, 
+                                 mark = t[i]))
+            }
           } else {
             ## record the negative PT period that fail to pass slope restriction
             test_record <<-test_record %>% 
-              rbind(data.frame(REGTRYID = REGTRYID, donor_id_alias = donor_id, 
+              rbind(data.frame(REGTRYID = REGTRYID, 
+                               donor_id_alias = donor_id, 
                                x1 = t[j], x2 = t[i], 
-                               y1 = PHGDH[j], y2 = PHGDH[i], type = "negative"))
+                               y1 = PHGDH[j], y2 = PHGDH[i], 
+                               type = "negative"))
             PT_end <<- PT_end %>% 
-              rbind(data.frame(REGTRYID = REGTRYID, donor_id_alias = donor_id, 
+              rbind(data.frame(REGTRYID = REGTRYID, 
+                               donor_id_alias = donor_id, 
                                mark = t[i]))
           }
+        } else {
+          ## record the negative PT period that fail to pass time restriction
+          test_record <<-test_record %>% 
+            rbind(data.frame(REGTRYID = REGTRYID, 
+                             donor_id_alias = donor_id, 
+                             x1 = t[j], x2 = t[i], 
+                             y1 = PHGDH[j], y2 = PHGDH[i], 
+                             type = "negative"))
+          PT_end <<- PT_end %>% 
+            rbind(data.frame(REGTRYID = REGTRYID, 
+                             donor_id_alias = donor_id, 
+                             mark = t[i]))
         }
       }
-      ## Stop PT test as there is already a positive PT period
-      if (stop) {break}
     }
-    PT_end <<- distinct(PT_end)
-    return(c(test,period))
+    return(c(length(PHGDH)-1,period))
   }
+
+

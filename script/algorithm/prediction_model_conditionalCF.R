@@ -1,6 +1,6 @@
 ##__________________________________________________________________
 ## Author: Ningxin Kang (nik010@ucsd.edu)       
-## Last update: 2022-08-13    
+## Last update: 2022-08-16    
 ## File: prediction_model_conditionalCF.R          
 ## Functions: 
 ##  prediction_model(PT_span, PT_span_max, CF_span, PT_angle, CF_angle, 
@@ -14,12 +14,17 @@
 ##  predictive value) and illustration.
 ## Note:
 ##  Cognitive score phase checker: conditional
+##    PT positive -> current+future
+##    PT negative -> current
 ##__________________________________________________________________
 
 
 ############Loading Libraries############
 library(dplyr)
 library(tidyr)
+############Sourcing functions############
+source('./script/algorithm/PT_version3.R')
+source('./script/algorithm/CF.R')
 
 #' A predictive-model-based screening test
 #' 

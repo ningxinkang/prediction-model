@@ -1,16 +1,8 @@
 ##__________________________________________________________________
 ## Author: Ningxin Kang (nik010@ucsd.edu)       
-## Last update: 2022-08-12    
-## File: modeling_result_illustartion.R          
-## Functions: 
-##  1. PT_checker(PT_angle, PT_span, PT_span_max, t, PHGDH, donor_id, REGTRYID)
-##  2. CF_checker(CF_angle, CF_span, t, DRS, CF_start, 
-##  positive_PT_end, CF_end, drop_out_span)
-##  3. prediction_model(PT_span, PT_span_max, CF_span, PT_angle, CF_angle, 
-##  drop_out_span, donors_PHGDH, donors_PHGDH_t, 
-##  donors_DRS, donors_DRS_t, sequence)
+## Last update: 2022-08-15
+## File: modeling_result_illustartion.R
 ## File Summary:
-##  This file include the code of the prediction model (full test).
 ##  The functions allow user to input the longitudinal dataset and
 ##  parameters, and output with the prediction result, including
 ##  statistics (accuracy, positive predictive value, and negaitve
@@ -27,67 +19,11 @@ library(lemon)
 library(gtools)
 library(stringr)
 
-##########Set coordinates for individual ggplot2 facets############
-## This code block is directly copied from:
-## https://gist.github.com/burchill/d780d3e8663ad15bcbda7869394a348a
-
-UniquePanelCoords <- ggplot2::ggproto(
-  "UniquePanelCoords", ggplot2::CoordCartesian,
-  
-  num_of_panels = 1,
-  panel_counter = 1,
-  panel_ranges = NULL,
-  
-  setup_layout = function(self, layout, params) {
-    self$num_of_panels <- length(unique(layout$PANEL))
-    self$panel_counter <- 1
-    layout
-  },
-  
-  setup_panel_params = 
-    function(self, scale_x, scale_y, params = list()) {
-      if (!is.null(self$panel_ranges) & length(self$panel_ranges) !=
-          self$num_of_panels)
-        stop("Number of panel ranges does not equal the number supplied")
-      
-      train_cartesian <- 
-        function(scale, limits, name, given_range = NULL) {
-          if (is.null(given_range)) {
-            expansion <- 
-              ggplot2:::default_expansion(scale, expand = self$expand)
-            range <- 
-              ggplot2:::expand_limits_scale(scale, expansion, 
-                                            coord_limits =
-                                              self$limits[[name]])
-          } else {
-            range <- given_range
-          }
-          out <- list(
-            ggplot2:::view_scale_primary(scale, limits, range),
-            sec = ggplot2:::view_scale_secondary(scale, limits, range),
-            arrange = scale$axis_order(),
-            range = range
-          )
-          names(out) <- c(name, paste0(name, ".", names(out)[-1]))
-          out
-        }
-      
-      cur_panel_ranges <- self$panel_ranges[[self$panel_counter]]
-      if (self$panel_counter < self$num_of_panels)
-        self$panel_counter <- self$panel_counter + 1
-      else
-        self$panel_counter <- 1
-      
-      c(train_cartesian(scale_x, self$limits$x, "x", cur_panel_ranges$x),
-        train_cartesian(scale_y, self$limits$y, "y", cur_panel_ranges$y))
-    }
-)
-
-coord_panel_ranges <- 
-  function(panel_ranges, expand = TRUE, default = FALSE, clip = "on") {
-    ggplot2::ggproto(NULL, UniquePanelCoords, panel_ranges = panel_ranges, 
-                     expand = expand, default = default, clip = clip)
-  }
+############Loading functions############
+source("./script/algorithm/PT_version3.R")
+source("./script/algorithm/CF.R")
+source("./script/algorithm/prediction_model_conditionalCF.R")
+source("./script/set_individual_coordinates.R")
 
 ################Loading datasets################
 #_______________________________________________

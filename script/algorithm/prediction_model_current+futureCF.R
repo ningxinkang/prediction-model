@@ -1,7 +1,7 @@
 ##__________________________________________________________________
 ## Author: Ningxin Kang (nik010@ucsd.edu)       
-## Last update: 2022-08-13    
-## File: prediction_model_futureCF.R          
+## Last update: 2022-08-16    
+## File: prediction_model_current+futureCF.R          
 ## Functions: 
 ##  prediction_model(PT_span, PT_span_max, CF_span, PT_angle, CF_angle, 
 ##  drop_out_span, donors_PHGDH, donors_PHGDH_t, 
@@ -13,13 +13,16 @@
 ##  statistics (accuracy, positive predictive value, and negaitve
 ##  predictive value) and illustration.
 ## Note:
-##  Cognitive score phase checker: future
+##  Cognitive score phase checker: current+future
 ##__________________________________________________________________
 
 
 ############Loading Libraries############
 library(dplyr)
 library(tidyr)
+############Sourcing functions############
+source('./script/algorithm/PT_version3.R')
+source('./script/algorithm/CF.R')
 
 #' A predictive-model-based screening test
 #' 
@@ -97,9 +100,6 @@ prediction_model <-
     
     ## Start looping through individuals in the dataset
     for (x in 1:length(donors_PHGDH)) {
-      ## reset to empty for each individual
-      PT_end <<- PT_end[0,]
-      
       ## Label exRNA PHGDH level
       PT_result = PT_checker(PT_angle, PT_span, PT_span_max, 
                              donors_PHGDH_t[[x]], donors_PHGDH[[x]], 
@@ -109,39 +109,15 @@ prediction_model <-
         rbind(data.frame(REGTRYID = sequence[x,1], 
                          donor_id_alias = sequence[x,2], 
                          num = as.numeric(PT_result[[1]])))
-      if (length(PT_result) == 1 & nrow(PT_end) > 0) {
+      if (length(PT_result) == 1) {
         ## If there is no positive PT period, meaning the individual does not
         ## have increase in exRNA PHGDH level.
         
-        ## Use 'count' to keep track of the number of positive CF periods of
-        ## the tested individual
-        count = 0
-        for (i in 1:nrow(PT_end)){
-          CF_result = CF_checker(CF_angle, CF_span, 
-                                 donors_DRS_t[[x]], donors_DRS[[x]],
-                                 donors_PHGDH_t[[x]][[1]], NA, 
-                                 PT_end[i,3], drop_out_span)
-          count = count + length(CF_result)
-          if ((length(CF_result)) != 0){
-            ## Record the decreasing CF period and drop-out period
-            for (y in 1:length(CF_result)){
-              if (CF_result[[y]][[3]]== "o"){
-                CF_positives <<- CF_positives %>% 
-                  rbind(data.frame(REGTRYID = sequence[x,1], 
-                                   donor_id_alias = sequence[x,2], 
-                                   start = CF_result[[y]][[1]], 
-                                   end = CF_result[[y]][[2]]))
-              } else {
-                drop_out_record <<- drop_out_record %>% 
-                  rbind(data.frame(REGTRYID = sequence[x,1], 
-                                   donor_id_alias = sequence[x,2], 
-                                   start = CF_result[[y]][[1]], 
-                                   end = CF_result[[y]][[2]]))
-              }
-            }
-          }
-        }
-        if (count == 0) {
+        CF_result = CF_checker(CF_angle, CF_span, 
+                               donors_DRS_t[[x]], donors_DRS[[x]],
+                               donors_PHGDH_t[[x]][[1]], NA, 
+                               NA, drop_out_span)
+        if((length(CF_result)) == 0){
           ## If there is NO positive CF period, meaning the individual is not 
           ## having cognitive decline. Taken together, those are TNs.
           full_true_negative = full_true_negative + 1
@@ -151,6 +127,22 @@ prediction_model <-
                              donor_id_alias = sequence[x,2], 
                              label = "TN"))
         } else {
+          ## Record the decreasing CF period and drop-out period
+          for (y in 1:length(CF_result)){
+            if (CF_result[[y]][[3]]== "o"){
+              CF_positives <<- CF_positives %>% 
+                rbind(data.frame(REGTRYID = sequence[x,1], 
+                                 donor_id_alias = sequence[x,2], 
+                                 start = CF_result[[y]][[1]], 
+                                 end = CF_result[[y]][[2]]))
+            } else {
+              drop_out_record <<- drop_out_record %>% 
+                rbind(data.frame(REGTRYID = sequence[x,1], 
+                                 donor_id_alias = sequence[x,2], 
+                                 start = CF_result[[y]][[1]], 
+                                 end = CF_result[[y]][[2]]))
+            }
+          }
           ## If there is positive CF period, meaning the individual is having
           ## cognitive decline. Taken together, those are FNs.
           full_false_negative = full_false_negative + 1
@@ -159,11 +151,9 @@ prediction_model <-
                              donor_id_alias = sequence[x,2], 
                              label = "FN"))
         }
-      }
-      else if (length(PT_result) > 1 & nrow(PT_end) > 0){
+      } else {
         ## if there is positive PT period found, meaning the individual
         ## is found to have increase in exRNA PHGDH level
-        
         simple_positive = simple_positive + 1
         PT_positives <<- PT_positives %>% 
           rbind(data.frame(REGTRYID = sequence[x,1], 
