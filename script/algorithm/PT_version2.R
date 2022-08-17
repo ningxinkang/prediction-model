@@ -58,7 +58,7 @@ library(tidyr)
 #' @examples
 #' PT_checker(1.5, 0.4, c(-12.0, -11.0, -10.0, -9.0, -8.0, -6.5, -5.5, -4.0, -3.0, -1.5, 0.0), c(10.17161, 5.47887, 8.37505, 3.071834, 42.142075, 68.835006), "C_1_F", "14058")
 
-input_checker <- 
+PT_checker <- 
   function(PT_angle, PT_span, PT_span_max, t, PHGDH, donor_id, REGTRYID){
     ## Return variables record the number of test conducted and the time span of 
     ## the increasing period. 
@@ -75,9 +75,8 @@ input_checker <-
       t_earliest = t[i] - PT_span_max
       t_latest = t[i] - PT_span
       test = test + 1
-      
       ## Start comparing
-      for (j in 1:i-1){
+      for (j in 1:(i-1)){
         if (t[j] >= t_earliest & t[j] <= t_latest){
           t_i_start = j+1
           t_i_end = i

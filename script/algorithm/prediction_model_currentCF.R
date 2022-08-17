@@ -20,9 +20,6 @@
 ############Loading Libraries############
 library(dplyr)
 library(tidyr)
-############Sourcing functions############
-source('./script/algorithm/PT_version3.R')
-source('./script/algorithm/CF.R')
 
 #' A predictive-model-based screening test
 #' 
@@ -73,6 +70,8 @@ source('./script/algorithm/CF.R')
 #' simple_PPV: positive predictive value per simple test
 #' simple_NPV: negative predictive value per simple test
 #' simple_total_number: total number of simple tests conducted
+#' simple_positive: total number of positive simple tests,
+#' simple_total_number - simple_positive: total number of negative simple tests,
 #' simple_true_positive: number of true positives
 #' simple_true_negative: number of true negatives
 
@@ -240,5 +239,7 @@ prediction_model <-
     
     return(c(full_accuracy, full_PPV, full_NPV, 
              simple_accuracy, simple_PPV, simple_NPV, 
-             simple_total_number, simple_true_positive, simple_true_negative))
+             simple_total_number, simple_positive, 
+             simple_total_number - simple_positive,
+             simple_true_positive, simple_true_negative))
   }

@@ -46,7 +46,7 @@ source("./script/set_individual_coordinates.R")
 ## and their corresponding time stamp
 
 PHGDH <- 
-  read.csv("ADRC_PHGDH_with_cogscore_noAD.csv", header = TRUE, sep = ',') %>% 
+  read.csv("./data/ADRC_PHGDH_with_cogscore_noAD.csv", header = TRUE, sep = ',') %>% 
   drop_na(TPM) %>% arrange(x.axis) %>% group_by(donor_id_alias)
 donors_PHGDH = split(PHGDH$TPM,PHGDH$donor_id_alias)
 donors_PHGDH_t = split(PHGDH$x.axis,PHGDH$donor_id_alias)
@@ -55,7 +55,7 @@ colnames(PHGDH)[3] <- "value"
 colnames(PHGDH)[2] <- "time"
 
 DRS <- 
-  read.csv("ADRC_PHGDH_with_cogscore_noAD.csv", header = TRUE, sep = ',') %>% 
+  read.csv("./data/ADRC_PHGDH_with_cogscore_noAD.csv", header = TRUE, sep = ',') %>% 
   drop_na(DRS) %>% arrange(x.axis) %>% group_by(donor_id_alias)
 donors_DRS = split(DRS$DRS,DRS$donor_id_alias)
 donors_DRS_t = split(DRS$x.axis,DRS$donor_id_alias)
@@ -65,7 +65,7 @@ colnames(DRS)[2] <- "time"
 
 sequence <- distinct(PHGDH[,4:5]) %>% arrange(donor_id_alias)
 convert_dates <- 
-  read.csv("ADRC_PHGDH_with_cogscore_noAD.csv", header = TRUE, sep = ',') %>% 
+  read.csv("./data/ADRC_PHGDH_with_cogscore_noAD.csv", header = TRUE, sep = ',') %>% 
   select(REGTRYID,donor_id_alias,convert_date) %>% 
   arrange(donor_id_alias) %>% 
   distinct()
@@ -79,75 +79,9 @@ CF_angle <- -0.45
 drop_out_span <- 3
 
 ################Set up storing variables################
-x <- c("REGTRYID", "donor_id_alias", "start", "end")
-
-## A dataframe, record the positive PT periods.
-PT_positives <- data.frame(matrix(ncol = 4, nrow = 0))
-colnames(PT_positives) <- x
-
-## A dataframe, record the positive CF periods.
-CF_positives <- data.frame(matrix(ncol = 4, nrow = 0))
-colnames(CF_positives) <- x
-
-## A dataframe, record the true positive current CF periods.
-CF_current_TPs <- data.frame(matrix(ncol = 4, nrow = 0))
-colnames(CF_current_TPs) <- x
-
-## A dataframe, record the true positive future CF periods.
-CF_future_TPs <- data.frame(matrix(ncol = 4, nrow = 0))
-colnames(CF_future_TPs) <- x
-
-## A dataframe, record the drop-out periods.
-drop_out_record <-data.frame(matrix(ncol = 4, nrow = 0))
-colnames(drop_out_record) <- x
-
-## A dataframe, record the result of full test.
-## TP/TN/FP/FN
-annotation <- data.frame(matrix(ncol = 3, nrow = 0))
-colnames(annotation) <- c("REGTRYID", "donor_id_alias", "label")
-
-## A dataframe, record the total number of simple test conducted
-## for each individual
-num_simple_test <- data.frame(matrix(ncol = 3, nrow = 0))
-colnames(num_simple_test) <- c("REGTRYID", "donor_id_alias", "num")
-
-## A dataframe, record all the PT conducted
-## for each individual
-test_record <-data.frame(matrix(ncol = 7, nrow = 0))
-colnames(test_record) <- 
-  c("REGTRYID", "donor_id_alias", "x1", "x2", "y1","y2","type")
-
-## A dataframe, record the end of PT
-## for each individual
-PT_end <- data.frame(matrix(ncol = 3, nrow = 0))
-colnames(PT_end) <- c("REGTRYID", "donor_id_alias", "mark")
-
-## A dataframe, record the category of the TP CF decline period
-## current/future/drop-out
-decline_categorization <- data.frame(matrix(ncol = 3, nrow = 0))
-colnames(decline_categorization) <- 
-  c("REGTRYID", "donor_id_alias", "label")
-
-## A dataframe, record the time and PHGDH level of two ends of 
-## positive PT periods.
-PT_highlight <- data.frame(matrix(ncol = 5, nrow = 0))
-colnames(PT_highlight) <- c("sample_id_alias", "time", "value",
-                            "REGTRYID","donor_id_alias")
-
-## A dataframe, record the time and PHGDH level of two ends of 
-## positive CF current periods.
-CF_current_highlight <- data.frame(matrix(ncol = 6, nrow = 0))
-colnames(CF_current_highlight) <- c("sample_id_alias", "time", "value",
-                                    "REGTRYID","donor_id_alias", "index")
-
-## A dataframe, record the time and PHGDH level of two ends of 
-## positive CF future periods.
-CF_future_highlight <- data.frame(matrix(ncol = 6, nrow = 0))
-colnames(CF_future_highlight) <- c("sample_id_alias", "time", "value",
-                                   "REGTRYID","donor_id_alias", "index")
-
+source('./script/storing_variables.R')
 ################PREDICTION TEST#####################
-performance <- prediction_model(PT_span, PT_span_max, CF_span, PT_angle,
+performance <- prediction_model_con(PT_span, PT_span_max, CF_span, PT_angle,
                                 CF_angle, drop_out_span, donors_PHGDH,
                                 donors_PHGDH_t, donors_DRS, 
                                 donors_DRS_t, sequence)
@@ -395,8 +329,8 @@ caption <- paste("Details: accuracy_per_full_test =", performance[1],
                  "; NPV_per_simple_test =", performance[6],
                  "; total_num_of_simple_tests =", performance[7],
                  "; avg_simple_tests_per_person =", performance[7]/20,
-                 "; num_of_TP_simple_test = ", performance[8],
-                 "; num_of_TN_simple_test = ", performance[9],
+                 "; num_of_TP_simple_test = ", performance[10],
+                 "; num_of_TN_simple_test = ", performance[11],
                  "; num_of_current_TP_simple_test =", simple_current_TP,
                  "; num_of_future_TP_simple_test =", simple_future_TP,
                  "; num_of_drop-out_TP_simple_test =", simple_dropout_TP,
