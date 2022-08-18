@@ -31,7 +31,10 @@ The cohort we used to train the predictive model comes from Zhong lab’s previo
         ├── modeling_result_illustartion.R                   <- code for modeling result illustration
         ├── parameter_fine_tuning.R                          <- code for setting loops for parameter fine tuning
         ├── PT_algorithm_selection.R                         <- code that include the candidate parameter sets for three versions of PT checkers
-        ├── set_individual_coordinates.R                     <- an environment code
-        └── storing_variables.R                              <- setup 
+        ├── set_individual_coordinates.R                     <- an environment code referenced from online resources, allowing users to set individual coordinates for each facets in ggplot2
+        └── storing_variables.R                              <- setup variables for information storing during the model training process
 
+
+
+**Last update: Aug 18, 2022**
 
