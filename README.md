@@ -8,6 +8,7 @@ The cohort we used to train the predictive model comes from Zhong lab’s previo
 
 ## Directory Structure
 
+    .
     ├── data
     │   └── ADRC_PHGDH_with_cogscore_noAD.csv
     ├── nohup.out
