@@ -7,7 +7,7 @@ This repository include the code and result of prediction model building, traini
 The cohort we used to train the predictive model comes from Zhong lab’s previous study, *Presymptomatic Increase of an Extracellular RNA in Blood Plasma Associates with the Development of Alzheimer’s Disease*. The data is publicly available on [GEO: GSE136243](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE136243).
 
 ## Directory Structure
-'''
+'
 .
 ├── data
 │   └── ADRC_PHGDH_with_cogscore_noAD.csv
@@ -48,5 +48,5 @@ The cohort we used to train the predictive model comes from Zhong lab’s previo
     ├── PT_algorithm_selection.R
     ├── set_individual_coordinates.R
     └── storing_variables.R
-'''
+'
 
