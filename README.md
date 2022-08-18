@@ -9,30 +9,29 @@ The cohort we used to train the predictive model comes from Zhong lab’s previo
 ## Directory Structure
 
     .
-    ├── data
+    ├── data                                         <- includes the sample formatted longitudinal dataset     
     │   └── ADRC_PHGDH_with_cogscore_noAD.csv
-    ├── nohup.out
     ├── README.md
-    ├── result
-    │   ├── algorithm_selection
+    ├── result                                       <- includes model performance, graph, etc.                                   
+    │   ├── algorithm_selection                      <- performances of the model trained with three versions of PT checker
     │   │   ├── PT_version1.csv
     │   │   ├── PT_version2.csv
     │   │   └── PT_version3.csv
-    │   ├── modeling
-    │   └── parameter_fine_tuning.csv
-    └── script
-        ├── algorithm
-        │   ├── CF.R
-        │   ├── prediction_model_conditionalCF.R
-        │   ├── prediction_model_currentCF.R
-        │   ├── prediction_model_current+futureCF.R
-        │   ├── PT_version1.R
-        │   ├── PT_version2.R
-        │   └── PT_version3.R
-        ├── modeling_result_illustartion.R
-        ├── parameter_fine_tuning.R
-        ├── PT_algorithm_selection.R
-        ├── set_individual_coordinates.R
-        └── storing_variables.R
+    │   ├── modeling                                 <- illustartions of the model, and graphs for variable comparison
+    │   └── parameter_fine_tuning.csv                <- accuracy, PPV, NPV, and other specific informations of models trained with 11664 candidate parameter combinations              
+    └── script                                       <- includes scripts for the prediction model algorithm and further analysis
+        ├── algorithm                                <- scripts for the prediction model algorithm
+        │   ├── CF.R                                 <- cognitive function checker, label cognitive score
+        │   ├── prediction_model_conditionalCF.R                            <- function that combine the two labeling functions
+        │   ├── prediction_model_currentCF.R                              
+        │   ├── prediction_model_current+futureCF.R                        
+        │   ├── PT_version1.R                                <- predictive test checker, label the exRNA PHGDH level
+        │   ├── PT_version2.R                             
+        │   └── PT_version3.R                   
+        ├── modeling_result_illustartion.R                   <- code for modeling result illustration
+        ├── parameter_fine_tuning.R                          <- code for setting loops for parameter fine tuning
+        ├── PT_algorithm_selection.R                         <- code that include the candidate parameter sets for three versions of PT checkers
+        ├── set_individual_coordinates.R                     <- an environment code
+        └── storing_variables.R                              <- setup 
 
 
