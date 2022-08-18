@@ -4,7 +4,7 @@
 This repository include the code and result of prediction model building, training, and fine-tuning. The model is intended to predict cognitive decline in probable AD patients using the exRNA level of a specific gene, PHGDH.
 
 ## Dataset
-The cohort we used to train the predictive model comes from Zhong lab’s previous study, *Presymptomatic Increase of an Extracellular RNA in Blood Plasma Associates with the Development of Alzheimer’s Disease*. The data is publicly available on [GEO: GSE136243](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE136243).
+The cohort we used to train the predictive model comes from Zhong lab’s previous study, *Presymptomatic Increase of an Extracellular RNA in Blood Plasma Associates with the Development of Alzheimer’s Disease*. Zhangming Yan, Zixu Zhou, Qiuyang Wu, Zhen Bouman Chen, Edward H. Koo, Sheng Zhong. Current Biology, 2020, 30:1771–1782. The TPM_normalized data is publicly available on [GEO: GSE136243](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE136243).
 
 ## Directory Structure
 
