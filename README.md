@@ -1,7 +1,7 @@
 # A Blood-Test Based Predictive Model for the Cognitive Decline in Probable Alzheimer’s Disease Patients
 
 ## About
-This repository include the code and result of prediction model building, training, and fine-tuning.
+This repository include the code and result of prediction model building, training, and fine-tuning. The model is intended to predict cognitive decline in probable AD patients use exRNA level of a specific gene, PHGDH.
 
 ## Dataset
 The cohort we used to train the predictive model comes from Zhong lab’s previous study, *Presymptomatic Increase of an Extracellular RNA in Blood Plasma Associates with the Development of Alzheimer’s Disease*. The data is publicly available on [GEO: GSE136243](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE136243).
@@ -21,8 +21,8 @@ The cohort we used to train the predictive model comes from Zhong lab’s previo
     │   └── parameter_fine_tuning.csv                <- accuracy, PPV, NPV, and other specific informations of models trained with 11664 candidate parameter combinations              
     └── script                                       <- includes scripts for the prediction model algorithm and further analysis
         ├── algorithm                                <- scripts for the prediction model algorithm
-        │   ├── CF.R                                 <- cognitive function checker, label cognitive score
-        │   ├── prediction_model_conditionalCF.R                            <- function that combine the two labeling functions
+        │   ├── CF.R                                 <- cognitive function checker, label the cognitive score
+        │   ├── prediction_model_conditionalCF.R             <- function that combine two labeling functions, and evaluate the model performance
         │   ├── prediction_model_currentCF.R                              
         │   ├── prediction_model_current+futureCF.R                        
         │   ├── PT_version1.R                                <- predictive test checker, label the exRNA PHGDH level
